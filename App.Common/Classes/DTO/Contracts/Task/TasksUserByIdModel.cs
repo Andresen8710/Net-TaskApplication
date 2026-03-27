@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace App.Common.Classes.DTO.Contracts.Task
+﻿namespace App.Common.Classes.DTO.Contracts.Task
 {
-	internal class TasksUserByIdModel
+	public class TasksUserByIdModel
 	{
+		public string? Name { get; set; }
+		public string? Description { get; set; }
+		public Guid PriorityId { get; set; }
+		public Guid UserId { get; set; }
+		public DateTime StartDate { get; set; }
+		public DateTime DueDate { get; set; }
+		public int EstimatedTime { get; set; }
+		public Guid StatusId { get; set; }
 	}
 }
