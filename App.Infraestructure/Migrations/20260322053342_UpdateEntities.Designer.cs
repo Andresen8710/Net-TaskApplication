@@ -12,20 +12,20 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace App.Infraestructure.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250131022259_addPriority")]
-    partial class addPriority
+    [Migration("20260322053342_UpdateEntities")]
+    partial class UpdateEntities
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.12")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("App.Infraestructure.DataBase.Entities.PriorityEntity", b =>
+            modelBuilder.Entity("App.Domain.Entities.PriorityEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -51,7 +51,7 @@ namespace App.Infraestructure.Migrations
                     b.ToTable("Priorities");
                 });
 
-            modelBuilder.Entity("App.Infraestructure.DataBase.Entities.RoleEntity", b =>
+            modelBuilder.Entity("App.Domain.Entities.RoleEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -77,7 +77,7 @@ namespace App.Infraestructure.Migrations
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("App.Infraestructure.DataBase.Entities.TaskEntity", b =>
+            modelBuilder.Entity("App.Domain.Entities.TaskEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -92,11 +92,23 @@ namespace App.Infraestructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EstimatedTime")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("PriorityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("StatusId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("UpdateDate")
@@ -112,12 +124,14 @@ namespace App.Infraestructure.Migrations
 
                     b.HasIndex("PriorityId");
 
+                    b.HasIndex("StatusId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Tasks");
                 });
 
-            modelBuilder.Entity("App.Infraestructure.DataBase.Entities.TaskEntryEntity", b =>
+            modelBuilder.Entity("App.Domain.Entities.TaskEntryEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -127,6 +141,16 @@ namespace App.Infraestructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ScheduleDate")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("TaskId")
@@ -153,7 +177,34 @@ namespace App.Infraestructure.Migrations
                     b.ToTable("TaskEntries");
                 });
 
-            modelBuilder.Entity("App.Infraestructure.DataBase.Entities.UserEntity", b =>
+            modelBuilder.Entity("App.Domain.Entities.TaskStatus", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TaskStatuses");
+                });
+
+            modelBuilder.Entity("App.Domain.Entities.UserEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -204,16 +255,23 @@ namespace App.Infraestructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("App.Infraestructure.DataBase.Entities.TaskEntity", b =>
+            modelBuilder.Entity("App.Domain.Entities.TaskEntity", b =>
                 {
-                    b.HasOne("App.Infraestructure.DataBase.Entities.PriorityEntity", "Priority")
+                    b.HasOne("App.Domain.Entities.PriorityEntity", "Priority")
                         .WithMany("Tasks")
                         .HasForeignKey("PriorityId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
                         .HasConstraintName("FK_TaskEntity_PriorityEntity");
 
-                    b.HasOne("App.Infraestructure.DataBase.Entities.UserEntity", "User")
+                    b.HasOne("App.Domain.Entities.TaskStatus", "TaskStatus")
+                        .WithMany("Tasks")
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_TaskEntity_TaskStatus");
+
+                    b.HasOne("App.Domain.Entities.UserEntity", "User")
                         .WithMany("Tasks")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -222,19 +280,21 @@ namespace App.Infraestructure.Migrations
 
                     b.Navigation("Priority");
 
+                    b.Navigation("TaskStatus");
+
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("App.Infraestructure.DataBase.Entities.TaskEntryEntity", b =>
+            modelBuilder.Entity("App.Domain.Entities.TaskEntryEntity", b =>
                 {
-                    b.HasOne("App.Infraestructure.DataBase.Entities.TaskEntity", "Task")
+                    b.HasOne("App.Domain.Entities.TaskEntity", "Task")
                         .WithMany("TaskEntries")
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
                         .HasConstraintName("FK_TaskEntryEntity_TaskEntity");
 
-                    b.HasOne("App.Infraestructure.DataBase.Entities.UserEntity", "User")
+                    b.HasOne("App.Domain.Entities.UserEntity", "User")
                         .WithMany("TaskEntries")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -246,9 +306,9 @@ namespace App.Infraestructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("App.Infraestructure.DataBase.Entities.UserEntity", b =>
+            modelBuilder.Entity("App.Domain.Entities.UserEntity", b =>
                 {
-                    b.HasOne("App.Infraestructure.DataBase.Entities.RoleEntity", "Role")
+                    b.HasOne("App.Domain.Entities.RoleEntity", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -258,22 +318,27 @@ namespace App.Infraestructure.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("App.Infraestructure.DataBase.Entities.PriorityEntity", b =>
+            modelBuilder.Entity("App.Domain.Entities.PriorityEntity", b =>
                 {
                     b.Navigation("Tasks");
                 });
 
-            modelBuilder.Entity("App.Infraestructure.DataBase.Entities.RoleEntity", b =>
+            modelBuilder.Entity("App.Domain.Entities.RoleEntity", b =>
                 {
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("App.Infraestructure.DataBase.Entities.TaskEntity", b =>
+            modelBuilder.Entity("App.Domain.Entities.TaskEntity", b =>
                 {
                     b.Navigation("TaskEntries");
                 });
 
-            modelBuilder.Entity("App.Infraestructure.DataBase.Entities.UserEntity", b =>
+            modelBuilder.Entity("App.Domain.Entities.TaskStatus", b =>
+                {
+                    b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("App.Domain.Entities.UserEntity", b =>
                 {
                     b.Navigation("TaskEntries");
 

@@ -1,6 +1,7 @@
 ﻿using App.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using TaskStatus = App.Domain.Entities.TaskStatus;
 
 namespace App.Infraestructure.DataBase.Context
 {
@@ -14,10 +15,11 @@ namespace App.Infraestructure.DataBase.Context
             public virtual DbSet<TaskEntryEntity> TaskEntries { get; set; }
             public virtual DbSet<RoleEntity> Roles { get; set; }
             public virtual DbSet<PriorityEntity> Priorities { get; set; }
-        #endregion DbSets
+		    public virtual DbSet<TaskStatus> TaskStatuses { get; set; }
+		#endregion DbSets
 
 
-        public ApplicationContext() { }
+		public ApplicationContext() { }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options, IConfiguration configuration) :base(options)
         { 
@@ -96,6 +98,14 @@ namespace App.Infraestructure.DataBase.Context
                 .OnDelete(DeleteBehavior.NoAction);
             });
 
+            modelBuilder.Entity<TaskEntity>(entity =>
+            {
+                entity.HasOne(u => u.TaskStatus)
+                .WithMany(r => r.Tasks)
+                .HasForeignKey(u => u.StatusId)
+                .HasConstraintName("FK_TaskEntity_TaskStatus")
+                .OnDelete(DeleteBehavior.NoAction);
+            });
         }
     }
 }

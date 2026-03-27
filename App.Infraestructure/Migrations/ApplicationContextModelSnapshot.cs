@@ -89,11 +89,23 @@ namespace App.Infraestructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EstimatedTime")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("PriorityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("StatusId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("UpdateDate")
@@ -108,6 +120,8 @@ namespace App.Infraestructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("PriorityId");
+
+                    b.HasIndex("StatusId");
 
                     b.HasIndex("UserId");
 
@@ -124,6 +138,16 @@ namespace App.Infraestructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ScheduleDate")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("TaskId")
@@ -148,6 +172,33 @@ namespace App.Infraestructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("TaskEntries");
+                });
+
+            modelBuilder.Entity("App.Domain.Entities.TaskStatus", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TaskStatuses");
                 });
 
             modelBuilder.Entity("App.Domain.Entities.UserEntity", b =>
@@ -210,6 +261,13 @@ namespace App.Infraestructure.Migrations
                         .IsRequired()
                         .HasConstraintName("FK_TaskEntity_PriorityEntity");
 
+                    b.HasOne("App.Domain.Entities.TaskStatus", "TaskStatus")
+                        .WithMany("Tasks")
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_TaskEntity_TaskStatus");
+
                     b.HasOne("App.Domain.Entities.UserEntity", "User")
                         .WithMany("Tasks")
                         .HasForeignKey("UserId")
@@ -218,6 +276,8 @@ namespace App.Infraestructure.Migrations
                         .HasConstraintName("FK_TaskEntity_UserEntity");
 
                     b.Navigation("Priority");
+
+                    b.Navigation("TaskStatus");
 
                     b.Navigation("User");
                 });
@@ -268,6 +328,11 @@ namespace App.Infraestructure.Migrations
             modelBuilder.Entity("App.Domain.Entities.TaskEntity", b =>
                 {
                     b.Navigation("TaskEntries");
+                });
+
+            modelBuilder.Entity("App.Domain.Entities.TaskStatus", b =>
+                {
+                    b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("App.Domain.Entities.UserEntity", b =>

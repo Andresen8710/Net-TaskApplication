@@ -5,5 +5,6 @@ namespace App.Domain.Services.Task
 {
     public interface ITaskService:IBaseService<TaskModel>
     {
-    }
+        Task<List<TaskModel>> GetByUserIdAsync(Guid userId);
+	}
 }

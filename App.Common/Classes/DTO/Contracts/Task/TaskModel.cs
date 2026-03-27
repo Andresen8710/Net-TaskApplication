@@ -8,9 +8,13 @@ namespace App.Common.Classes.DTO.Contracts.Task
         public string? Description { get; set; }
         public Guid PriorityId { get; set; }
         public Guid UserId { get; set; }
+		public DateTime StartDate { get; set; }
+		public DateTime DueDate { get; set; }
+		public int EstimatedTime { get; set; }
+		public Guid StatusId { get; set; }
 
-        //public virtual UserModel? User { get; set; }
-        //public virtual List<TaskEntryModel>? TaskEntries { get; set; }
+		//public virtual UserModel? User { get; set; }
+		//public virtual List<TaskEntryModel>? TaskEntries { get; set; }
 
-    }
+	}
 }
