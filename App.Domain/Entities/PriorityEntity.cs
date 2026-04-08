@@ -6,7 +6,7 @@
         {
             Tasks= new HashSet<TaskEntity>();
         }
-        public string? Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         public virtual ICollection<TaskEntity> Tasks { get; set; }
     }

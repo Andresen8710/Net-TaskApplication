@@ -1,4 +1,5 @@
-﻿using App.Common.Classes.DTO.Contracts.Role;
+﻿using App.Common.Classes.DTO.Contracts.Priority;
+using App.Common.Classes.DTO.Contracts.Role;
 using App.Common.Classes.DTO.Contracts.Task;
 using App.Common.Classes.DTO.Contracts.User;
 using App.Domain.Entities;
@@ -17,6 +18,8 @@ namespace App.Config.Dependencies
             CreateMap<UserEntity,UserRoleModel >()
                 .ForMember(dest => dest.Role, opt =>opt.MapFrom(src=>src.Role.Name))
                 .ReverseMap();
+            CreateMap<PriorityEntity, PriorityModel>().ReverseMap();
+            CreateMap<TaskStatusEntity, TaskStatusModel>().ReverseMap();
         }
     }
 }

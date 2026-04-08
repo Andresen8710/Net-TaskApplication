@@ -13,8 +13,5 @@ namespace App.Common.Classes.DTO.Contracts.Task
 		public int EstimatedTime { get; set; }
 		public Guid StatusId { get; set; }
 
-		//public virtual UserModel? User { get; set; }
-		//public virtual List<TaskEntryModel>? TaskEntries { get; set; }
-
 	}
 }

@@ -12,9 +12,15 @@ namespace App.Infraestructure.Repositories.Task
         {
         }
 
-		public async Task<List<TaskEntity>> GetByUserIdAsync(Guid userId)
+		public async Task<List<VmGetTasksByUserId>> GetByUserIdAsync(Guid userId)
 		{
-			return await _context.Set<TaskEntity>().Where(t => t.UserId == userId).ToListAsync();
+			//return await _context.Set<TaskEntity>()
+			//	.Include(ts=>ts.TaskStatus)
+			//	.Where(t => t.UserId == userId).ToListAsync();
+
+			return await _context.Set<VmGetTasksByUserId>()
+				.Where(x => x.UserId == userId)
+				.ToListAsync();
 		}
 	}
 }

@@ -5,6 +5,6 @@ namespace App.Domain.Contracts.Repositories
 {
     public interface ITaskRepository:IBaseRepository<TaskEntity>
     {
-		Task<List<TaskEntity>> GetByUserIdAsync(Guid userId);
+		Task<List<VmGetTasksByUserId>> GetByUserIdAsync(Guid userId);
 	}
 }

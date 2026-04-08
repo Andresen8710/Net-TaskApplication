@@ -1,8 +1,8 @@
 ﻿namespace App.Domain.Entities
 {
-	public class TaskStatus : BaseEntity
+	public class TaskStatusEntity : BaseEntity
 	{
-		public TaskStatus()
+		public TaskStatusEntity()
 		{
 			Tasks = new HashSet<TaskEntity>();
 		}

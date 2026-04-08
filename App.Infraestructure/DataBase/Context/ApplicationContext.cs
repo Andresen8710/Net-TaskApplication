@@ -1,7 +1,7 @@
 ﻿using App.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using TaskStatus = App.Domain.Entities.TaskStatus;
+using TaskStatusEntity = App.Domain.Entities.TaskStatusEntity;
 
 namespace App.Infraestructure.DataBase.Context
 {
@@ -15,7 +15,8 @@ namespace App.Infraestructure.DataBase.Context
             public virtual DbSet<TaskEntryEntity> TaskEntries { get; set; }
             public virtual DbSet<RoleEntity> Roles { get; set; }
             public virtual DbSet<PriorityEntity> Priorities { get; set; }
-		    public virtual DbSet<TaskStatus> TaskStatuses { get; set; }
+		    public virtual DbSet<TaskStatusEntity> TaskStatuses { get; set; }
+            public virtual DbSet<VmGetTasksByUserId> Vm_GetTasksByUserId {  get; set; }
 		#endregion DbSets
 
 
@@ -106,6 +107,22 @@ namespace App.Infraestructure.DataBase.Context
                 .HasConstraintName("FK_TaskEntity_TaskStatus")
                 .OnDelete(DeleteBehavior.NoAction);
             });
+
+            modelBuilder.Entity<VmGetTasksByUserId>().HasNoKey();
+
+            // Convención: renombrar columna "Id" a "{Entidad}Id" en BD
+            // para evitar ambigüedad en vistas y JOINs
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                if (!typeof(BaseEntity).IsAssignableFrom(entityType.ClrType)) continue;
+
+                var idProperty = entityType.FindProperty(nameof(BaseEntity.Id));
+                if (idProperty != null)
+                {
+                    var entityName = entityType.ClrType.Name.Replace("Entity", "");
+                    idProperty.SetColumnName($"{entityName}Id");
+                }
+            }
         }
     }
 }

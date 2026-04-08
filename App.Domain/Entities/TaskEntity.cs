@@ -19,7 +19,7 @@
 		public virtual UserEntity User { get; set; }
         public virtual PriorityEntity Priority { get; set; }
         public virtual ICollection<TaskEntryEntity> TaskEntries { get; set; }
-        public virtual TaskStatus TaskStatus { get; set; }
+        public virtual TaskStatusEntity TaskStatus { get; set; }
 
 	}
 }

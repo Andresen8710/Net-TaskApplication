@@ -16,9 +16,9 @@ namespace App.Domain.Services.Task
 			_taskRepository = taskRepository;
 		}
 
-		public async Task<List<TaskModel>> GetByUserIdAsync(Guid userId)
+		public async Task<List<VmGetTasksByUserId>> GetByUserIdAsync(Guid userId)
 		{
-			return _mapper.Map<List<TaskModel>>(await _taskRepository.GetByUserIdAsync(userId));
+			return await _taskRepository.GetByUserIdAsync(userId);
 		}
 	}
 }

@@ -58,8 +58,27 @@ namespace App.Common.Classes.Base.Repository
 
             if (existingEntity == null) { throw new ApplicationException("Record Not Found."); }
 
-            _context.Remove(existingEntity);
-            await _context.SaveChangesAsync();
+            // _context.Remove(existingEntity);
+            //Verify if the entity has the IsDeleted Property
+            var isDeletedProp = typeof(TEntity).GetProperty("IsDeleted");
+
+            if (isDeletedProp != null && isDeletedProp.PropertyType==typeof(bool)) 
+            { 
+                var isDeleted = (bool)isDeletedProp.GetValue(existingEntity);
+                if (isDeleted)
+                {
+                    throw new ApplicationException("Record already logically Deleted");
+                }
+
+                isDeletedProp.SetValue(existingEntity, true);
+                _context.Update(existingEntity);
+            }
+            else
+            {
+				throw new ApplicationException($"The entity {typeof(TEntity).Name} does not support logical delete (IsDeleted property not found).");
+			}    
+
+                await _context.SaveChangesAsync();
             return existingEntity;
         }
 
